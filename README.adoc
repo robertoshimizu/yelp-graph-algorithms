@@ -1,0 +1,37 @@
+= Yelp Dataset Graph
+
+* Download the JSON version of the https://www.yelp.co.uk/dataset/download[Yelp Dataset Challenge^] and extract it into the `dataset` directory
+
+* Run the python code: csv_bulk_import.py, which will generate the CSV files in the `data`directory. Do not forget to use ID Spaces, because there will be lots of Nodes and relationships.
+
+```
+python csv_bulk_import.py
+```
+
+* The User_Friend_User.csv contains duplicate nodes, therefore the best effective way to eliminate is through Postegresql:
+
+```
+Postgres Treatment User_Friend_User.adoc
+```
+
+* Create a fresh neo4j database or docker container:
+
+```
+docker run --name yelp2 --env NEO4J_AUTH=none -p 7474:7474 -p 7687:7687 -p 7473:7473 -v $HOME/neo4j/data:/var/lib/neo4j/data -v $HOME/neo4j/logs:/var/lib/neo4j/logs -v $HOME/neo4j/import:/var/lib/neo4j/import -v $HOME/neo4j/plugins:/var/lib/neo4j/plugins -v $HOME/neo4j/conf:/var/lib/neo4j/conf  --env=NEO4J_dbms_active__database=yelp2.db --env NEO4J_dbms_security_procedures_unrestricted=apoc.\\\*,algo.\\\* --env NEO4J_apoc_export_file_enabled=true --env NEO4J_apoc_import_file_enabled=true --env NEO4J_dbms_memory_heap_initial__size=4G --env NEO4J_dbms_memory_heap_max__size=16G neo4j:latest 
+
+```
+
+* Go to another container and perform the neo4j-admin import. Make sure the csv files are located in the import directory binded to the import directory in the container.
+
+```
+$neo4j-admin import --database=yelp2.db --nodes user.csv --nodes business.csv --nodes review.csv --nodes category.csv --nodes city.csv --nodes state.csv  --relationships user_final.csv --relationships user_review.csv --relationships review_business.csv --relationships business_in_category.csv --relationships business_city.csv --relationships city_state.csv --ignore-missing-nodes=true --ignore-duplicate-nodes=true --multiline-fields=true  
+
+```
+
+* Leave and stop actual container and start the yelp container, in which the import was performed:
+
+```
+restart <name of container>
+```
+
+* Go to Neo4j (in the localhost:7474) and you're good to go

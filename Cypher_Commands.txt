@@ -1,0 +1,30 @@
+MATCH (a:User{user_id:'4G44cm9Sq9PKj6SVpwT5Mg'})-[:ACTED_IN{role:["Organizer"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'ZyHxwUHSZVkM-uU2XUrSsQ'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'zxc53C-PbISYqHTht22lig'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'Z18xWAU7vLqMavj9p1FRFw'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'z0Y1M0qe-EB7p62gvgIWHA'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'YM_i61CqjJtyK-3GgVH7Kg'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'zJr3ti1AZltFI-SOpAELwA'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'Fgn8nOoNMXaWzgx4SP9KAQ'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'iCtxZdGSYU_4TkEMB1DpAw'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+MATCH (a:User{user_id:'b_Imk8zvDmiuVLj18PSs4w'})-[:ACTED_IN{role:["Participant"]}]->(p:Pandero{id:'1'}) DETACH DELETE a, p
+
+
+MERGE (:User{user_id:'4G44cm9Sq9PKj6SVpwT5Mg'})-[:ACTED_IN{role:["Organizer"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'ZyHxwUHSZVkM-uU2XUrSsQ'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'zxc53C-PbISYqHTht22lig'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'Z18xWAU7vLqMavj9p1FRFw'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'z0Y1M0qe-EB7p62gvgIWHA'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'YM_i61CqjJtyK-3GgVH7Kg'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'zJr3ti1AZltFI-SOpAELwA'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'Fgn8nOoNMXaWzgx4SP9KAQ'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'iCtxZdGSYU_4TkEMB1DpAw'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+MERGE (:User{user_id:'b_Imk8zvDmiuVLj18PSs4w'})-[:ACTED_IN{role:["Participant"]}]->(:Pandero{id:'1'})
+
+MATCH (a:User{user_id:'4G44cm9Sq9PKj6SVpwT5Mg'}), (b:Pandero{id:'1'})
+MERGE (a)-[r:ACTED_IN{role:["Organizer"]}]->(b)
+RETURN a, b, r
+
+OPTIONAL MATCH (a:User{user_id:'ZyHxwUHSZVkM-uU2XUrSsQ'}), (b:Pandero{id:'1'})
+MERGE (a)-[r:ACTED_IN{role:["Participant"]}]->(b)
+RETURN a, b, r

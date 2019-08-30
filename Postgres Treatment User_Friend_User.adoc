@@ -1,0 +1,55 @@
+QUICK GUIDE POSTGRES FILE TREATMENT 
+
+ 
+
+Generate files: user.csv and user_FRIEND_user.csv  from user_bulk_import.py: $python ser_bulk_import.py 
+
+User_FRIEND_user.csv contains relationships to missing nodes and also bi-directional relationships (duplicates). Therefore we need to clean it up. 
+
+Usage of Postgresql to clean up the data 
+
+Create table user_friend: CREATE TABLE user_friend(start_id VARCHAR (22), id serial PRIMARY KEY, weight INTEGER, end_id VARCHAR (22), type VARCHAR (12)); 
+
+Copy user_FRIEND_user.csv to table user_friend: \COPY user_friend(start_id, id, weight, end_id, type) FROM '/var/lib/postgresql/data/user_FRIEND_user.csv' DELIMITER ',' CSV HEADER; 
+
+Check import: SELECT a1.id, a1.start_id, a1.end_id, b1.id, b1.start_id, b1.end_id  FROM user_friend a1 INNER JOIN user_friend b1 ON a1.end_id = b1.start_id LIMIT 25; 
+
+Reduce table user_friend to table user_dupli, eliminating the missing nodes, remaining only the bidirectional relationships: CREATE TABLE user_dupli AS SELECT a1.id, a1.start_id, a1.end_id, a1.type, a1.weight FROM user_friend a1 INNER JOIN user_friend b1 ON a1.end_id = b1.start_id AND a1.start_id = b1.end_id; 
+
+Check table: SELECT * FROM user_dupli LIMIT 15; 
+
+Check the duplicates: SELECT a1.id, a1.start_id, a1.end_id, b1.id, b1.start_id, b1.end_id  FROM user_dupli a1 INNER JOIN user_dupli b1 ON a1.end_id = b1.start_id AND a1.start_id = b1.end_id LIMIT 25; 
+
+Reduce to table user_final, eliminating the duplicates (mirror): CREATE TABLE user_final AS SELECT a1.start_id, a1.id, a1.weight, a1.end_id, a1.type FROM user_dupli b1 INNER JOIN user_dupli a1 ON b1.start_id = a1.end_id AND b1.end_id = a1.start_id AND b1.start_id > b1.end_id; 
+
+CHECK table: SELECT * FROM user_final LIMIT 25; 
+
+Export table user_final to user_final.csv: COPY user_final to '/var/lib/postgresql/data/user_final.csv' DELIMITER ',' CSV HEADER;  
+
+Edit user_final using vim to edit/change the headers: :START_ID(User_ID),id,weight,:END_ID(User-ID),:TYPE 
+
+IMPORT to Neo4j 
+
+Copy files: user.csv and the post-treated user_final.csv to ~/neo4j/import 
+
+Delete previous yelp database 
+
+Start neo4j docker using a diferent container from yelp, for example algotrain: docker restart algotrain 
+
+Enter docker:docker exec -it algotrain bash 
+
+ Go to import directory: cd import 
+
+Run following command to import csv files into neo4j: neo4j-admin import --database=yelp.db --nodes user.csv  --relationships user_final.csv --ignore-missing-nodes=true --ignore-duplicate-nodes=true --multiline-fields=true 
+
+Exit and Stop container 
+
+Start or restart yelp container 
+
+Open browser and go to localhost:7474 (neo4j) 
+
+Check examples: MATCH (n1:User{user_id:'4G44cm9Sq9PKj6SVpwT5Mg'})-[r:CONNECTED_TO]-(n2) RETURN n1, n2, r LIMIT 25 
+
+ENJOY!! 
+
+ 
