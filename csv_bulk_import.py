@@ -98,6 +98,8 @@ if not os.path.isfile("data/city.csv"):
 
                             unique_cities = []
                             unique_states = []
+                            unique_city_state = []
+                            unique_business_city = []
                             for line in business_json.readlines():
                                 item = json.loads(line)
                                 if item["city"]:
@@ -107,8 +109,15 @@ if not os.path.isfile("data/city.csv"):
                                             csv.writer(city_csv).writerow([city_id, item["city"], "City"])
                                         else:
                                             city_id = unique_cities.index(item["city"])
-                                            csv.writer(business_city_csv).writerow([item["business_id"], city_id, "IN_CITY"])
-                                        
+                                            if unique_business_city==[]:
+                                                csv.writer(business_city_csv).writerow([item["business_id"], city_id, "IN_CITY"])
+                                                unique_business_city.append((item["business_id"],city_id))
+                                                #print((city_id, state_id))
+                                            else:
+                                                if ((item["business_id"],city_id)) not in unique_business_city:
+                                                    unique_business_city.append((item["business_id"],city_id))
+                                                    csv.writer(business_city_csv).writerow([item["business_id"], city_id, "IN_CITY"])
+                                                    #print((city_id, state_id))                                       
                                 if item["state"]:
                                         if item["state"] not in unique_states:
                                             unique_states.append(item["state"])
@@ -118,5 +127,15 @@ if not os.path.isfile("data/city.csv"):
                                             state_id = unique_states.index(item["state"])
                                             if item["city"]:
                                                 city_id = unique_cities.index(item["city"])
-                                            else: city_id = len(unique_cities) + 1
-                                            csv.writer(city_state_csv).writerow([city_id, state_id, "IN_AREA"])
+                                            else:
+                                                city_id = len(unique_cities) + 1
+                                if unique_city_state==[]:
+                                    csv.writer(city_state_csv).writerow([city_id, state_id, "IN_AREA"])
+                                    unique_city_state.append((city_id, state_id))
+                                    #print((city_id, state_id))
+                                else:
+                                    if ((city_id,state_id)) not in unique_city_state:
+                                        unique_city_state.append((city_id, state_id))
+                                        csv.writer(city_state_csv).writerow([city_id, state_id, "IN_AREA"])
+                                        #print((city_id, state_id))
+                    
